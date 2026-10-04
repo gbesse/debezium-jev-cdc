@@ -1,0 +1,4 @@
+{"op":"c","source":{"db":"shop","schema":"public","table":"reviews"},"after":{"id":7,"note":"The refund never arrived"}}
+{"op":"u","source":{"db":"shop","schema":"public","table":"reviews"},"before":{"id":7,"note":"Old"},"after":{"id":7,"note":"The refund never arrived"}}
+{"op":"d","source":{"db":"shop","schema":"public","table":"reviews"},"before":{"id":7,"note":"The refund never arrived"}}
+null
