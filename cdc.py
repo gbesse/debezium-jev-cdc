@@ -38,6 +38,7 @@ def process(event, db, policy, evaluate):
     if item is None:
         return None
     payload, source, row = item
+    policy_hash=digest(json.dumps(policy,sort_keys=True,separators=(",",":"),allow_nan=False))
     pk = row.get(policy["primary_key"])
     if pk is None or isinstance(pk, (dict, list, bool)):
         raise ValueError("invalid primary key")
@@ -46,13 +47,13 @@ def process(event, db, policy, evaluate):
     source_id = {"db": identity[0], "schema": identity[1], "table": identity[2], "pk": pk}
     if payload["op"] == "d":
         db.execute("DELETE FROM decisions WHERE source_key=?", (key,))
-        return {"op": "delete", "source": source_id, "policy_version": policy["version"],
-                "event_id": digest(key + ":delete:" + policy["version"])}
+        return {"op": "delete", "source": source_id, "policy_version": policy["version"], "policy_sha256":policy_hash,
+                "event_id": digest(key + ":delete:" + policy_hash)}
     value = row.get(policy["text_field"])
     if not isinstance(value, str) or not value.strip():
         raise ValueError("nonempty text required")
     text_hash = digest(value)
-    fingerprint = digest(policy["version"] + ":" + text_hash)
+    fingerprint = digest(policy_hash + ":" + text_hash)
     previous = db.execute("SELECT fingerprint FROM decisions WHERE source_key=?", (key,)).fetchone()
     if previous and previous[0] == fingerprint:
         return None
@@ -64,7 +65,7 @@ def process(event, db, policy, evaluate):
         raise ValueError("invalid probability")
     db.execute("INSERT INTO decisions(source_key,fingerprint) VALUES(?,?) "
                "ON CONFLICT(source_key) DO UPDATE SET fingerprint=excluded.fingerprint", (key, fingerprint))
-    return {"op": "upsert", "source": source_id, "policy_version": policy["version"],
+    return {"op": "upsert", "source": source_id, "policy_version": policy["version"], "policy_sha256":policy_hash,
             "choice": result["choice"], "probability": probability, "outcome": result["outcome"],
             "text_sha256": text_hash, "event_id": digest(key + ":" + fingerprint)}
 
