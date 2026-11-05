@@ -45,3 +45,12 @@ python3 -m unittest discover -s tests -v
 Para Jev real, omite `--fixtures` y define `TYPESAFE_API_KEY` en el entorno del servidor. Envía stdout a un consumidor idempotente: este CLI no gestiona Kafka ni sus confirmaciones. El umbral `0.9` es ilustrativo. Evalúa casos etiquetados antes de automatizar acciones.
 
 [Debezium transformations](https://debezium.io/documentation/reference/stable/transformations/index.html). Independent project, unaffiliated with Debezium or TypeSafe.
+
+
+## 2026-11-05 — FR / EN / ES
+
+FR : Le cache et les identifiants d’événement dépendent désormais du SHA-256 de la politique complète, pas seulement de son numéro de version. Modifier une instruction sans changer la version provoque un nouveau jugement. Les anciens fingerprints sont invalidés conservativement, sans modification de schéma SQLite.
+
+EN: Cache and event IDs now depend on the complete policy SHA-256 rather than version alone. Changing instructions without bumping version triggers new judgment. Old fingerprints conservatively invalidate without SQLite schema changes.
+
+ES: Caché e identificadores dependen ahora del SHA-256 de política completa, no solo versión. Cambiar instrucción sin cambiar versión provoca nuevo juicio. Invalida huellas anteriores conservadoramente sin cambiar esquema SQLite.
